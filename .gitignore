@@ -1,0 +1,9 @@
+completed_tasks.txt
+credentials.json
+token.json*
+taskscli
+__pycache__
+*.pyc
+*.pyo
+*.pyd
+*.db
