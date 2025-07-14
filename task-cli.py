@@ -91,7 +91,8 @@ def main():
 
         # Step 2: If due date is given, ask for time
         if due_date:
-            due_time = input(Fore.YELLOW + "Enter due time (HH:MM in 24hr format) [default: 23:59]: " + Fore.RESET).strip() or "23:59"
+            # due_time = input(Fore.YELLOW + "Enter due time (HH:MM in 24hr format) [default: 23:59]: " + Fore.RESET).strip() or "23:59"
+            due_time = "23:59"
             
             # Combine date and time into RFC 3339 format (UTC)
             try:

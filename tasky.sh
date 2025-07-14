@@ -17,6 +17,9 @@ function tasky() {
         read|"")
             python3 "$cli_path"
             ;;
+        login)
+            python3 "$cli_path" login
+            ;;
         create)
             if [ $# -ge 1 ]; then
                 python3 "$cli_path" create "$@"
