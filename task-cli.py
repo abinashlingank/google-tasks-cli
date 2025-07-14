@@ -5,7 +5,9 @@ from update import update_task_status
 from delete import delete_task, clean_up_completed_tasks
 from colorama import Fore, Style, init
 import sys
+from datetime import datetime, timezone
 from os import system
+import readline
 
 init(autoreset=True)
 
@@ -75,9 +77,36 @@ def main():
 
     if command == "create":
         title = input(Fore.YELLOW + "Enter task title: " + Fore.RESET)
-        due = input(Fore.YELLOW + "Due date (YYYY-MM-DD)? [optional]: " + Fore.RESET) or None
-        notes = input(Fore.YELLOW + "Notes? [optional]: " + Fore.RESET) or None
+        
+        # Step 1: Ask if today is the due date
+        due_date = None
+        due_time = None
+        today_str = datetime.today().strftime("%Y-%m-%d")
+        use_today = input(Fore.YELLOW + f"Default due date is {today_str}. Is that okay? (Y/n): " + Fore.RESET).strip().lower() or "y"
+        
+        if use_today == "y":
+            due_date = today_str
+        else:
+            due_date = input(Fore.YELLOW + "Enter due date (YYYY-MM-DD) [optional]: " + Fore.RESET).strip() or None
+
+        # Step 2: If due date is given, ask for time
+        if due_date:
+            due_time = input(Fore.YELLOW + "Enter due time (HH:MM in 24hr format) [default: 23:59]: " + Fore.RESET).strip() or "23:59"
+            
+            # Combine date and time into RFC 3339 format (UTC)
+            try:
+                dt = datetime.strptime(f"{due_date} {due_time}", "%Y-%m-%d %H:%M")
+                # If you want local time, use `.isoformat()` without Z
+                due = dt.strftime("%Y-%m-%dT%H:%M:%S.000Z")
+            except ValueError:
+                print(Fore.RED + "❌ Invalid date or time format.")
+                return
+        else:
+            due = None
+
+        notes = input(Fore.YELLOW + "Notes? [optional]: " + Fore.RESET).strip() or None
         task = create_task(task_list, title, service, due=due, notes=notes)
+
         if task:
             print(Fore.GREEN + f"✅ Task '{task.get('title', 'No Title')}' created!")
             tasks = list_tasks_by_list_name(task_list, service)
@@ -85,6 +114,7 @@ def main():
         else:
             print(Fore.RED + "❌ Failed to create task.")
         return
+
 
     if command in ["do", "undo", "delete"]:
         tasks = list_tasks_by_list_name(task_list, service)
